@@ -13,6 +13,7 @@ export class AuthService {
 
   createUser(email: string, password: string) {
     const userData: AuthData = { email, password };
+    console.log(userData);
     this.http.post(`${this.API}/signup`, userData).subscribe(response => {
       console.log(response);
     });
@@ -20,6 +21,7 @@ export class AuthService {
 
   login(email: string, password: string) {
     const userData: AuthData = { email, password };
+    console.log(userData);
     this.http.post(`${this.API}/login`, userData).subscribe(response => {
       console.log(response);
     });

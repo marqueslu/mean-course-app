@@ -12,16 +12,14 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   createUser(email: string, password: string) {
-    const userData: AuthData = { email, password };
-    console.log(userData);
+    const userData: AuthData = { email, password };  
     this.http.post(`${this.API}/signup`, userData).subscribe(response => {
       console.log(response);
     });
   }
 
   login(email: string, password: string) {
-    const userData: AuthData = { email, password };
-    console.log(userData);
+    const userData: AuthData = { email, password };    
     this.http.post(`${this.API}/login`, userData).subscribe(response => {
       console.log(response);
     });

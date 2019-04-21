@@ -9,15 +9,17 @@ import { Router } from "@angular/router";
 @Injectable({ providedIn: "root" })
 export class PostService {
   private posts: Post[] = [];
-  private postsUpdated = new Subject<{ posts: Post[], postCount: number }>();
+  private postsUpdated = new Subject<{ posts: Post[]; postCount: number }>();
   private readonly API = `${environment.API}/api/posts`;
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router) {}
 
   getPosts(postsPerPage: number, currentPage: number) {
     const queryParams = `?pageSize=${postsPerPage}&page=${currentPage}`;
     this.http
-      .get<{ message: string; posts: any, maxPosts: number }>(this.API + queryParams)
+      .get<{ message: string; posts: any; maxPosts: number }>(
+        this.API + queryParams
+      )
       .pipe(
         map(postData => {
           return {
@@ -29,15 +31,16 @@ export class PostService {
                 imagePath: post.imagePath,
                 creator: post.creator
               };
-            }), maxPosts: postData.maxPosts
+            }),
+            maxPosts: postData.maxPosts
           };
         })
       )
-      .subscribe(transformedPostData => {        
+      .subscribe(transformedPostData => {
         this.posts = transformedPostData.posts;
-        this.postsUpdated.next({ 
-          posts: [...this.posts], 
-          postCount: transformedPostData.maxPosts 
+        this.postsUpdated.next({
+          posts: [...this.posts],
+          postCount: transformedPostData.maxPosts
         });
       });
   }
@@ -47,45 +50,49 @@ export class PostService {
   }
 
   getPost(id: string) {
-    return this.http.get<{ _id: string, title: string, content: string, imagePath: string }>(`${this.API}/${id}`);
+    return this.http.get<{
+      _id: string;
+      title: string;
+      content: string;
+      imagePath: string;
+      creator: string;
+    }>(`${this.API}/${id}`);
   }
-  addPost(title: string, content: string, image: File) {
-    // const post: Post = { id: null, title: title, content: content };
 
+  addPost(title: string, content: string, image: File) {
     const postData = new FormData();
 
     postData.append("title", title);
     postData.append("content", content);
     postData.append("image", image, title);
     this.http
-      .post<{ message: string, post: Post }>(this.API, postData)
-      .subscribe(responseData => {        
+      .post<{ message: string; post: Post }>(this.API, postData)
+      .subscribe(responseData => {
         this.router.navigate(["/"]);
       });
   }
 
   updatePost(id: string, title: string, content: string, image: File | string) {
     let postData: Post | FormData;
-    if (typeof (image) === "object") {
+    if (typeof image === "object") {
       postData = new FormData();
       postData.append("id", id);
       postData.append("title", title);
       postData.append("content", content);
       postData.append("image", image, title);
-    }
-    else {
+    } else {
       postData = {
         id: id,
         title: title,
         content: content,
-        imagePath: image
+        imagePath: image,
+        creator: null
       };
     }
 
-    this.http.put(`${this.API}/${id}`, postData)
-      .subscribe(response => {      
-        this.router.navigate(["/"]);
-      });
+    this.http.put(`${this.API}/${id}`, postData).subscribe(response => {
+      this.router.navigate(["/"]);
+    });
   }
 
   deletePost(postId: string) {

@@ -1,41 +1,45 @@
-import { Component, OnInit } from '@angular/core';
-import { Post } from '../post.model';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { PostService } from '../posts.service';
-import { ActivatedRoute, ParamMap } from '@angular/router';
-import { mimeType } from './mime-type.validator';
+import { Component, OnInit } from "@angular/core";
+import { Post } from "../post.model";
+import { FormGroup, FormControl, Validators } from "@angular/forms";
+import { PostService } from "../posts.service";
+import { ActivatedRoute, ParamMap } from "@angular/router";
+import { mimeType } from "./mime-type.validator";
 
 @Component({
-  selector: 'app-post-create',
-  templateUrl: './post-create.component.html',
-  styleUrls: ['./post-create.component.css']
+  selector: "app-post-create",
+  templateUrl: "./post-create.component.html",
+  styleUrls: ["./post-create.component.css"]
 })
 export class PostCreateComponent implements OnInit {
-
-  enteredContent = '';
-  enteredTitle = '';
+  enteredContent = "";
+  enteredTitle = "";
   isLoading = false;
   post: Post;
   form: FormGroup;
-  private mode = 'create';
+  private mode = "create";
   private postId: string;
   imagePreview: string;
 
-  constructor(public postsService: PostService, public route: ActivatedRoute) { }
+  constructor(public postsService: PostService, public route: ActivatedRoute) {}
 
   onAddPost() {
     if (this.form.invalid) {
       return;
     }
     this.isLoading = true;
-    if (this.mode === 'create') {
-      this.postsService.addPost(this.form.value.title, this.form.value.content, this.form.value.image);
+    if (this.mode === "create") {
+      this.postsService.addPost(
+        this.form.value.title,
+        this.form.value.content,
+        this.form.value.image
+      );
     } else {
       this.postsService.updatePost(
         this.postId,
         this.form.value.title,
         this.form.value.content,
-        this.form.value.image);        
+        this.form.value.image
+      );
     }
     this.form.reset();
   }
@@ -43,7 +47,7 @@ export class PostCreateComponent implements OnInit {
   onImagePicked(event: Event) {
     const file = (event.target as HTMLInputElement).files[0];
     this.form.patchValue({ image: file });
-    this.form.get('image').updateValueAndValidity();
+    this.form.get("image").updateValueAndValidity();
     const reader = new FileReader();
     reader.onload = () => {
       this.imagePreview = reader.result.toString();
@@ -60,21 +64,23 @@ export class PostCreateComponent implements OnInit {
         validators: [Validators.required]
       }),
       image: new FormControl(null, {
-        validators: [Validators.required], asyncValidators: [mimeType]
+        validators: [Validators.required],
+        asyncValidators: [mimeType]
       })
     });
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
-      if (paramMap.has('postId')) {
-        this.mode = 'edit';
-        this.postId = paramMap.get('postId');
+      if (paramMap.has("postId")) {
+        this.mode = "edit";
+        this.postId = paramMap.get("postId");
         this.postsService.getPost(this.postId).subscribe(postData => {
           this.isLoading = false;
-          this.post = { 
-            id: postData._id, 
-            title: postData.title, 
-            content: postData.content, 
-            imagePath: postData.imagePath 
-          };          
+          this.post = {
+            id: postData._id,
+            title: postData.title,
+            content: postData.content,
+            imagePath: postData.imagePath,
+            creator: postData.creator
+          };
           this.form.setValue({
             title: this.post.title,
             content: this.post.content,
@@ -82,7 +88,7 @@ export class PostCreateComponent implements OnInit {
           });
         });
       } else {
-        this.mode = 'create';
+        this.mode = "create";
         this.postId = null;
       }
     });

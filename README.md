@@ -1,5 +1,7 @@
 # MeanCourseFrontEnd
 
+Note: The API of this respository is available in [mean-course-api](https://github.com/marqueslu/mean-course-api) 
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.0.5.
 
 ## Development server
